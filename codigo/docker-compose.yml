@@ -1,0 +1,75 @@
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+    restart: always
+
+  kafka1:
+    image: confluentinc/cp-kafka:7.0.0
+    container_name: kafka1
+    ports:
+      - "9093:9093"
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL=PLAINTEXT
+      - KAFKA_LISTENER_NAME_INTERNAL=INTERNAL
+      - KAFKA_ADVERTISED_LISTENER_INTERNAL=kafka1:9093
+      - KAFKA_LISTENER_INTERNAL_PORT=9093
+      - KAFKA_LISTENER_PORT=9093
+      - KAFKA_LISTENER_INTERNAL=INTERNAL
+    depends_on:
+      - zookeeper
+    restart: always
+
+  kafka2:
+    image: confluentinc/cp-kafka:7.0.0
+    container_name: kafka2
+    ports:
+      - "9094:9094"
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL=PLAINTEXT
+      - KAFKA_LISTENER_NAME_INTERNAL=INTERNAL
+      - KAFKA_ADVERTISED_LISTENER_INTERNAL=kafka2:9094
+      - KAFKA_LISTENER_INTERNAL_PORT=9094
+      - KAFKA_LISTENER_PORT=9094
+      - KAFKA_LISTENER_INTERNAL=INTERNAL
+    depends_on:
+      - zookeeper
+    restart: always
+
+  kafka3:
+    image: confluentinc/cp-kafka:7.0.0
+    container_name: kafka3
+    ports:
+      - "9095:9095"
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL=PLAINTEXT
+      - KAFKA_LISTENER_NAME_INTERNAL=INTERNAL
+      - KAFKA_ADVERTISED_LISTENER_INTERNAL=kafka3:9095
+      - KAFKA_LISTENER_INTERNAL_PORT=9095
+      - KAFKA_LISTENER_PORT=9095
+      - KAFKA_LISTENER_INTERNAL=INTERNAL
+    depends_on:
+      - zookeeper
+    restart: always
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS=kafka1:9093,kafka2:9094,kafka3:9095
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka1
+      - kafka2
+      - kafka3
+    restart: always
